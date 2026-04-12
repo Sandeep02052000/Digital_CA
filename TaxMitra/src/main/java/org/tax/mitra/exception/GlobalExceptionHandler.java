@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
         log.error("Business exception: {}", ex.getMessage());
 
         ErrorResponse response = ErrorResponse.builder()
-                .success(false)
+                .status(ErrorResponse.Status.FAILED)
                 .message(ex.getMessage())
                 .errorCode(ex.getErrorCode())
                 .timestamp(LocalDateTime.now())
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
                 .orElse("Validation error");
 
         ErrorResponse response = ErrorResponse.builder()
-                .success(false)
+                .status(ErrorResponse.Status.FAILED)
                 .message(errorMessage)
                 .errorCode("VALIDATION_ERROR")
                 .timestamp(LocalDateTime.now())
@@ -62,7 +62,7 @@ public class GlobalExceptionHandler {
         log.error("Unhandled exception occurred", ex);
 
         ErrorResponse response = ErrorResponse.builder()
-                .success(false)
+                .status(ErrorResponse.Status.FAILED)
                 .message("Internal server error")
                 .errorCode("INTERNAL_SERVER_ERROR")
                 .timestamp(LocalDateTime.now())

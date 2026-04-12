@@ -8,9 +8,14 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class ErrorResponse {
-    private boolean success;
+    private Status status;
     private String message;
     private String errorCode;
     private LocalDateTime timestamp;
     private String path;
+    public enum Status {
+        SUCCESS,
+        FAILED,
+        PENDING
+    }
 }

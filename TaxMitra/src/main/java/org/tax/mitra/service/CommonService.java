@@ -1,32 +1,61 @@
 package org.tax.mitra.service;
 
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.util.internal.ObjectUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.tax.mitra.common.ResponseContext;
+import org.tax.mitra.constants.ServiceType;
 import org.tax.mitra.model.RequestContext;
+import org.tax.mitra.model.TriggerOtpRequestModel;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Component
-public abstract class CommonService<T extends RequestContext> {
+import static org.tax.mitra.constants.CodeConstants.*;
 
-    abstract protected Map<String, Object> executeService(Map<String, Object> request) throws IllegalAccessError, InvocationTargetException;
-    public Map<String, Object> execute(Map<String, Object> request) {
+public abstract class CommonService<T extends RequestContext> {
+    private static final ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    ResponseContext context;
+
+    protected abstract Map<String, Object> executeService(Map<String, Object> request) throws InvocationTargetException;
+
+    public abstract ServiceType getServiceType();
+
+    public void execute(T requestModel) {
+        Map<String, Object> request = mapper.convertValue(requestModel, new TypeReference<Map<String, Object>>() {});
         Map<String, Object> response = new HashMap<>();
         try {
-            request.replace("serviceId", generateServiceId(request));
+            request.put("serviceId", generateServiceId());
             response = executeService(request);
-        } catch (InvocationTargetException ignored) {
+            mapFinalResponse(response);
 
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Error executing service: " + getServiceType(), e);
         }
-        return response;
     }
 
-    private Object generateServiceId(Map request) {
-        return UUID.randomUUID().toString();
+    private void mapFinalResponse(Map<String, Object> response) {
+        Object error = response.get(ERROR);
+        if (error == null || error.toString().trim().isEmpty()) {
+            context.setSuccess(true);
+            context.setCode(SUCCESS);
+            context.setMessage((String) response.get(MESSAGE));
+            context.setData(response.get(DATA));
+            context.setHttpStatus(200);
+        } else {
+            context.setSuccess(false);
+            context.setCode(FAILURE);
+            context.setMessage((String) response.get(MESSAGE));
+            context.setData(response.get(DATA));
+            context.setHttpStatus(400);
+        }
+    }
 
+    private String generateServiceId() {
+        return UUID.randomUUID().toString();
     }
 }

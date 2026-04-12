@@ -1,44 +1,62 @@
 package org.tax.mitra.service.otpService;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.util.internal.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.stereotype.Component;
 import org.tax.mitra.cache.SystemPreferenceCache;
 import org.tax.mitra.config.TaxConfiguration;
-import org.tax.mitra.constants.Constants;
-import org.tax.mitra.constants.ErrorCodes;
-import org.tax.mitra.constants.ServiceConstant;
+import org.tax.mitra.constants.*;
 import org.tax.mitra.entity.OtpRecord;
 import org.tax.mitra.exception.OtpException;
 import org.tax.mitra.model.ValidateOtpRequest;
 import org.tax.mitra.repository.OtpRecordRepository;
 import org.tax.mitra.service.CommonService;
+import org.tax.mitra.service.sessionService.GenerateSession;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.tax.mitra.constants.CodeConstants.*;
 
-
+@Component
 public class OtpValidateService extends CommonService<ValidateOtpRequest> {
+    private static final Logger logger = LoggerFactory.getLogger(OtpValidateService.class);
     private static final String OTP = "otp";
     private static final String PHONE_NUMBER = "phoneNumber";
+    private static final String OTP_SESSION_PREFIX = "OTP_SESSION:";
     private final RedisTemplate<String, String> redisTemplate;
     private final TaxConfiguration configuration;
     private final SystemPreferenceCache cache;
     private final OtpRecordRepository repository;
+    private  final DefaultRedisScript<String> otpVerifyScript;
+    private final GenerateSession session;
 
     @Autowired
     public OtpValidateService(RedisTemplate<String, String> redisTemplate,
                               TaxConfiguration configuration,
                               SystemPreferenceCache cache,
-                              OtpRecordRepository repository) {
+                              OtpRecordRepository repository,
+                              DefaultRedisScript<String> otpVerifyScript,
+                              GenerateSession session) {
         this.redisTemplate = redisTemplate;
         this.configuration = configuration;
         this.cache = cache;
         this.repository = repository;
+        this.otpVerifyScript = otpVerifyScript;
+        this.session = session;
+    }
+
+    @Override
+    public ServiceType getServiceType() {
+        return ServiceType.OTP_VALIDATE;
     }
 
     /**
@@ -48,27 +66,37 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
      * @throws InvocationTargetException
      */
     @Override
-    protected Map<String, Object> executeService(Map<String, Object> request) throws IllegalAccessError, InvocationTargetException {
+    protected Map<String, Object> executeService(Map<String, Object> request) throws IllegalAccessError {
+
         String otp = (String) request.get(OTP);
         String msisdn = (String) request.get(PHONE_NUMBER);
         if(StringUtil.isNullOrEmpty(otp) || StringUtil.isNullOrEmpty(msisdn)) {
-            throw new OtpException("Invalid request payload", ErrorCodes.BAD_REQUEST);
+            throw new OtpException("Invalid request", ErrorCodes.BAD_REQUEST);
         }
         if(!validateMsisdn(msisdn)) {
             throw new OtpException("Invalid Phone Number",ErrorCodes.BAD_REQUEST);
         }
         if(!validateOtp(otp)) {
-            throw new OtpException("Otp is not valid",ErrorCodes.BAD_REQUEST);
+            throw new OtpException("Invalid OTP",ErrorCodes.BAD_REQUEST);
         }
         boolean isEnabled = Boolean.parseBoolean(configuration.getPropertyByServiceCode(Constants.REDIS_CONFIG_ENABLED.getValue(), ServiceConstant.GEN_OTP.getValue(), "True"));
         if(isEnabled) {
-            String otpFromCache = redisTemplate.opsForValue().get(msisdn);
-            if(StringUtil.isNullOrEmpty(otpFromCache)) {
-                throw new OtpException("OTP Expired, please try again!",ErrorCodes.BAD_REQUEST);
-            } else if(!otp.equalsIgnoreCase(otpFromCache)) {
-                throw new OtpException("Invalid OTP, please try with the valid OTP",ErrorCodes.BAD_REQUEST);
-            } else {
-                return Map.of(STATUS,OK_STATUS);
+            String key = REDIS_KEY_PREFIX + msisdn;
+            String result = redisTemplate.execute(
+                    otpVerifyScript,
+                    java.util.Collections.singletonList(key),
+                    otp
+            );
+            switch (result) {
+                case "VERIFIED":
+                    return session.createTemporarySessionForGstInUserValidation(OTP_SESSION_PREFIX,msisdn);
+                case "INVALID":
+                    throw new OtpException("Invalid OTP, please try again", ErrorCodes.BAD_REQUEST);
+                case "MAX_ATTEMPTS":
+                    throw new OtpException("Maximum attempts reached. OTP expired.", ErrorCodes.BAD_REQUEST);
+                case "EXPIRED":
+                default:
+                    throw new OtpException("OTP expired, please try again", ErrorCodes.BAD_REQUEST);
             }
         } else {
             Optional<OtpRecord> optionalRecord =
@@ -94,14 +122,17 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
             }
             record.setOtpStatus(OtpRecord.OtpStatus.USED);
             repository.save(record);
-            return Map.of(STATUS,OK_STATUS);
+            return session.createTemporarySessionForGstInUserValidation(OTP_SESSION_PREFIX,msisdn);
         }
     }
     private boolean validateOtp(String otp) {
-        if(otp.length() == Integer.parseInt(cache.getValue(OTP_LENGTH))) {
-            return true;
+        int otpLength;
+        try {
+            otpLength = Integer.parseInt(cache.getValue(OTP_LENGTH));
+        } catch (Exception e) {
+            otpLength = CodeConstants.DEFAULT_OTP_LENGTH;
         }
-        return false;
+        return otp.length() == otpLength;
     }
     private boolean validateMsisdn(String msisdn) {
         if (msisdn == null || msisdn.isEmpty()) {

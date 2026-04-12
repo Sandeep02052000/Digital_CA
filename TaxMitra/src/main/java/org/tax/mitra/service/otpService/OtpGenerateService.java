@@ -2,14 +2,15 @@ package org.tax.mitra.service.otpService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.tax.mitra.cache.SystemPreferenceCache;
 import org.tax.mitra.config.TaxConfiguration;
-import org.tax.mitra.constants.Constants;
-import org.tax.mitra.constants.ErrorCodes;
-import org.tax.mitra.constants.ServiceConstant;
+import org.tax.mitra.constants.*;
 import org.tax.mitra.entity.OtpRecord;
 import org.tax.mitra.exception.OtpException;
 import org.tax.mitra.model.Otp;
@@ -19,17 +20,17 @@ import org.tax.mitra.service.CommonService;
 
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import static org.tax.mitra.constants.CodeConstants.OTP_LENGTH;
+import static org.tax.mitra.constants.CodeConstants.*;
 
 @Component
-@Slf4j
 public class OtpGenerateService extends CommonService<TriggerOtpRequestModel> {
+    private static final Logger logger = LoggerFactory.getLogger(OtpGenerateService.class);
     private static final String PHONE_NUMBER = "phoneNumber";
-    private static final String REDIS_KEY_PREFIX = "OTP:";
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final RedisTemplate<String, String> redisTemplate;
@@ -47,7 +48,13 @@ public class OtpGenerateService extends CommonService<TriggerOtpRequestModel> {
     }
 
     @Override
+    public ServiceType getServiceType() {
+        return ServiceType.OTP_GENERATE;
+    }
+    @Override
     protected Map<String, Object> executeService(Map<String, Object> request) {
+        logger.info("Inside generate Otp Service :: {}",request);
+        Map<String,Object> response = new HashMap<>();
         String phoneNumber = (String) request.get(PHONE_NUMBER);
         if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
             throw new OtpException("Phone number is required", ErrorCodes.BAD_REQUEST);
@@ -55,42 +62,53 @@ public class OtpGenerateService extends CommonService<TriggerOtpRequestModel> {
         phoneNumber = phoneNumber.trim();
         Otp otp = new Otp();
         otp.setPayload(mapper.convertValue(request, Otp.OriginalPayload.class));
-        generateOtp(otp, phoneNumber);
-        return otp.toMap();
+        if(generateOtp(otp, phoneNumber)) {
+            response.put(DATA,otp.toMap());
+            response.put(MESSAGE,"OTP Generated Successfully");
+        } else {
+            response.put(MESSAGE,"Failed to generate OTP");
+        }
+        return response;
     }
-    private void generateOtp(Otp otp, String phoneNumber) {
+
+    /**
+     * @return
+     */
+    private boolean generateOtp(Otp otp, String phoneNumber) {
         String generatedOtp = randomOtpGenerator();
         otp.setOtp(generatedOtp);
         long expirySeconds = getExpirySeconds();
         Instant expiryTime = Instant.now().plusSeconds(expirySeconds);
         otp.setExpiryTime(expiryTime);
         boolean isRedisEnabled = isRedisEnabled();
-        log.info("Generating OTP for msisdn={}, redisEnabled={}", phoneNumber, isRedisEnabled);
+        logger.info("Generating OTP for msisdn={}, redisEnabled={}", phoneNumber, isRedisEnabled);
         if (isRedisEnabled) {
             handleRedisStorage(phoneNumber, generatedOtp, expirySeconds);
         } else {
             handleDatabaseStorage(phoneNumber, generatedOtp);
         }
+        return true;
     }
 
     private void handleRedisStorage(String phoneNumber, String otp, long expirySeconds) {
-        String key = REDIS_KEY_PREFIX + phoneNumber;
+        try {
 
-        String existingOtp = redisTemplate.opsForValue().get(key);
-        if (existingOtp != null) {
-            throw new OtpException(
-                    "OTP already sent. Please wait before retrying.",
-                    ErrorCodes.TOO_MANY_REQUESTS
-            );
+            String key = REDIS_KEY_PREFIX + phoneNumber.trim();
+            Boolean exists = redisTemplate.hasKey(key);
+            if (Boolean.TRUE.equals(exists)) {
+                throw new OtpException(
+                        "OTP already sent. Please wait before retrying.",
+                        ErrorCodes.TOO_MANY_REQUESTS
+                );
+            }
+            redisTemplate.opsForHash().put(key, "code", otp);
+            redisTemplate.opsForHash().put(key, "attempts", "0");
+            redisTemplate.opsForHash().put(key, "status", "active");
+            redisTemplate.expire(key, expirySeconds, TimeUnit.SECONDS);
+        } catch (RedisSystemException ex) {
+            throw new OtpException(ex.getMessage(), ErrorCodes.BAD_REQUEST);
         }
-        redisTemplate.opsForValue().set(
-                key,
-                otp,
-                expirySeconds,
-                TimeUnit.SECONDS
-        );
     }
-
     private void handleDatabaseStorage(String phoneNumber, String otp) {
         Optional<OtpRecord> existingRecord =
                 repository.findTopByPhoneNumberAndOtpStatusOrderByCreatedOnDesc(
@@ -113,8 +131,8 @@ public class OtpGenerateService extends CommonService<TriggerOtpRequestModel> {
         try {
             otpLength = Integer.parseInt(preferenceCache.getValue(OTP_LENGTH));
         } catch (Exception e) {
-            log.warn("Invalid OTP_LENGTH config, defaulting to 6");
-            otpLength = 6;
+            logger.warn("Invalid OTP_LENGTH config, defaulting to 6");
+            otpLength = CodeConstants.DEFAULT_OTP_LENGTH;
         }
         if (otpLength <= 0) {
             throw new OtpException("OTP length must be greater than 0", ErrorCodes.BAD_REQUEST);
@@ -135,7 +153,7 @@ public class OtpGenerateService extends CommonService<TriggerOtpRequestModel> {
                     )
             );
         } catch (Exception e) {
-            log.warn("Invalid OTP expiry config, defaulting to 120 seconds");
+            logger.warn("Invalid OTP expiry config, defaulting to 120 seconds");
             return 120L;
         }
     }
@@ -149,7 +167,7 @@ public class OtpGenerateService extends CommonService<TriggerOtpRequestModel> {
                     )
             );
         } catch (Exception e) {
-            log.warn("Redis config missing, defaulting to enabled");
+            logger.warn("Redis config missing, defaulting to enabled");
             return true;
         }
     }
