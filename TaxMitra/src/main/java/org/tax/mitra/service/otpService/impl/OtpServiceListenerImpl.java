@@ -1,7 +1,6 @@
 package org.tax.mitra.service.otpService.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.tax.mitra.constants.ServiceType;
 import org.tax.mitra.model.TriggerOtpRequestModel;
@@ -9,8 +8,6 @@ import org.tax.mitra.model.ValidateOtpRequest;
 import org.tax.mitra.service.CommonService;
 import org.tax.mitra.service.ServiceRegistry;
 import org.tax.mitra.service.otpService.OtpServiceListener;
-
-import java.util.Map;
 
 @Service
 public class OtpServiceListenerImpl implements OtpServiceListener {

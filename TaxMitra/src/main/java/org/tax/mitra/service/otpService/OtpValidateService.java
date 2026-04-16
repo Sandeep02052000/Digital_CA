@@ -1,6 +1,5 @@
 package org.tax.mitra.service.otpService;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.util.internal.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,17 +11,21 @@ import org.tax.mitra.cache.SystemPreferenceCache;
 import org.tax.mitra.config.TaxConfiguration;
 import org.tax.mitra.constants.*;
 import org.tax.mitra.entity.OtpRecord;
+import org.tax.mitra.entity.User;
+import org.tax.mitra.entity.UserGstin;
 import org.tax.mitra.exception.OtpException;
 import org.tax.mitra.model.ValidateOtpRequest;
 import org.tax.mitra.repository.OtpRecordRepository;
+import org.tax.mitra.repository.UserGstinRepository;
+import org.tax.mitra.repository.UserRepository;
 import org.tax.mitra.service.CommonService;
 import org.tax.mitra.service.sessionService.GenerateSession;
+import org.tax.mitra.service.userProfileService.UserCreation;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.tax.mitra.constants.CodeConstants.*;
 
@@ -36,6 +39,9 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
     private final TaxConfiguration configuration;
     private final SystemPreferenceCache cache;
     private final OtpRecordRepository repository;
+    private final UserRepository userRepository;
+    private final UserGstinRepository userGstinRepository;
+    private final UserCreation creation;
     private  final DefaultRedisScript<String> otpVerifyScript;
     private final GenerateSession session;
 
@@ -44,12 +50,15 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
                               TaxConfiguration configuration,
                               SystemPreferenceCache cache,
                               OtpRecordRepository repository,
-                              DefaultRedisScript<String> otpVerifyScript,
+                              UserRepository userRepository, UserGstinRepository userGstinRepository, UserCreation creation, DefaultRedisScript<String> otpVerifyScript,
                               GenerateSession session) {
         this.redisTemplate = redisTemplate;
         this.configuration = configuration;
         this.cache = cache;
         this.repository = repository;
+        this.userRepository = userRepository;
+        this.userGstinRepository = userGstinRepository;
+        this.creation = creation;
         this.otpVerifyScript = otpVerifyScript;
         this.session = session;
     }
@@ -88,8 +97,9 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
                     otp
             );
             switch (result) {
-                case "VERIFIED":
-                    return session.createTemporarySessionForGstInUserValidation(OTP_SESSION_PREFIX,msisdn);
+                case "VERIFIED": {
+                    return executeInternalGstinValidate(msisdn);
+                }
                 case "INVALID":
                     throw new OtpException("Invalid OTP, please try again", ErrorCodes.BAD_REQUEST);
                 case "MAX_ATTEMPTS":
@@ -122,8 +132,24 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
             }
             record.setOtpStatus(OtpRecord.OtpStatus.USED);
             repository.save(record);
-            return session.createTemporarySessionForGstInUserValidation(OTP_SESSION_PREFIX,msisdn);
+            return executeInternalGstinValidate(msisdn);
         }
+    }
+
+    private Map<String, Object> executeInternalGstinValidate(String msisdn) {
+        User user = userRepository.findByPhoneNumber(msisdn).
+                orElseGet(() -> creation.createUser(msisdn));
+        Optional<UserGstin> gst = userGstinRepository.findByUserId(user.getId());
+        Map<String, Object> response = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        response.put(MESSAGE, "OTP Verified Successfully");
+        data.put("userId",user.getId());
+        data.put("isNewUser",gst.isEmpty());
+        data.put("hasGstin",gst.isPresent());
+        data.put("nextScreen",gst.isPresent() ? "dashboard":"gstin");
+        data.put("sessionId", session.createTemporarySessionForGstInUserValidation(OTP_SESSION_PREFIX, msisdn));
+        response.put(DATA, data);
+        return response;
     }
     private boolean validateOtp(String otp) {
         int otpLength;

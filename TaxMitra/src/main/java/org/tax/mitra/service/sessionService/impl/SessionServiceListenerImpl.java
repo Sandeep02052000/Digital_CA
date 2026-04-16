@@ -3,7 +3,6 @@ package org.tax.mitra.service.sessionService.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.tax.mitra.constants.ServiceType;
-import org.tax.mitra.model.TriggerOtpRequestModel;
 import org.tax.mitra.model.ValidateSessionRequest;
 import org.tax.mitra.service.CommonService;
 import org.tax.mitra.service.ServiceRegistry;

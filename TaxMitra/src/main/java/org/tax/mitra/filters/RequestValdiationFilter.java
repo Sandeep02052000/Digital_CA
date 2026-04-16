@@ -12,7 +12,9 @@ import java.io.IOException;
 @Component
 @Order(2)
 public class RequestValdiationFilter implements Filter {
+
     private static final String secretKey = "subalTech";
+
     @Override
     public void doFilter(ServletRequest servletRequest,
                          ServletResponse servletResponse,
@@ -20,12 +22,20 @@ public class RequestValdiationFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        String apiKey = request.getHeader("X-API-KEY").trim();
-        if(StringUtil.isNullOrEmpty(apiKey)) {
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String apiKey = request.getHeader("X-API-KEY");
+        if (StringUtil.isNullOrEmpty(apiKey)) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().write("Please pass the secret key in the request");
             return;
-        } else if (!apiKey.equalsIgnoreCase(secretKey)) {
+        }
+
+        if (!apiKey.equalsIgnoreCase(secretKey)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Invalid API Key");
             return;

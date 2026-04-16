@@ -1,4 +1,4 @@
-//package org.tax.mitra.service.notificationService.notificationConsumer;
+//package org.tax.mitra.service.notificationConsumer;
 //
 //import org.springframework.kafka.annotation.KafkaListener;
 //import org.springframework.stereotype.Service;

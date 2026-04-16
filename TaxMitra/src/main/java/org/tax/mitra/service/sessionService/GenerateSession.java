@@ -15,9 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.tax.mitra.constants.CodeConstants.DATA;
-import static org.tax.mitra.constants.CodeConstants.MESSAGE;
-
 @Component
 public class GenerateSession {
     private static final Logger logger = LoggerFactory.getLogger(GenerateSession.class);
@@ -31,7 +28,7 @@ public class GenerateSession {
         this.configuration = configuration;
     }
 
-    public Map<String, Object> createTemporarySessionForGstInUserValidation(String prefix, String msisdn) {
+    public String createTemporarySessionForGstInUserValidation(String prefix, String msisdn) {
         String sessionId = UUID.randomUUID().toString();
         String redisKey = prefix + sessionId;
         Map<String, Object> sessionData = new HashMap<>();
@@ -50,12 +47,7 @@ public class GenerateSession {
             logger.error("Error storing OTP session in Redis", e);
             throw new OtpException("Session creation failed", ErrorCodes.BAD_REQUEST);
         }
-        Map<String, Object> response = new HashMap<>();
-        Map<String, String> data = new HashMap<>();
-        response.put(MESSAGE, "OTP Verified Successfully");
-        data.put("sessionId", sessionId);
-        response.put(DATA, data);
-        return response;
+        return sessionId;
     }
 
     private long getExpirySeconds(String service) {
