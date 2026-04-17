@@ -32,10 +32,26 @@ public class ValidateSession extends CommonService<ValidateSessionRequest> {
 
     @Override
     protected Map<String, Object> executeService(Map<String, Object> request) {
-        String msisdn = (String) request.get(PHONE_NUMBER);
+
+        String type = (String) request.get("type");
+        String value = (String) request.get("value");
         String sessionId = (String) request.get(SESSION_ID);
         if (sessionId == null || sessionId.trim().isEmpty()) {
             throw new IllegalArgumentException("Session ID cannot be null or empty");
+        }
+        if (type == null || type.trim().isEmpty()
+                || value == null || value.trim().isEmpty()) {
+            throw new SessionException("Invalid request", ErrorCodes.BAD_REQUEST);
+        }
+        type = type.trim().toLowerCase();
+        value = value.trim();
+        String input = value;
+        if ("phone".equals(type)) {
+            input = value;
+        } else if ("email".equals(type)) {
+            input = value;
+        } else {
+            throw new SessionException("Invalid type. Allowed: phone/email", ErrorCodes.BAD_REQUEST);
         }
         String sessionKey = SESSION_PREFIX + sessionId;
         String sessionJson = redisTemplate.opsForValue().get(sessionKey);
@@ -46,17 +62,15 @@ public class ValidateSession extends CommonService<ValidateSessionRequest> {
         try {
             sessionData = objectMapper.readValue(sessionJson, Map.class);
         } catch (Exception e) {
-            throw new SessionException("Invalid session data format",ErrorCodes.BAD_REQUEST);
+            throw new SessionException("Invalid session data format", ErrorCodes.BAD_REQUEST);
         }
-        if (msisdn != null) {
-            String storedMobile = (String) sessionData.get("mobile");
-            if (storedMobile != null && !storedMobile.equals(msisdn)) {
-                throw new SessionException("Session does not belong to user",ErrorCodes.BAD_REQUEST);
-            }
+        String storedInput = (String) sessionData.get("input");
+        if (storedInput != null && !storedInput.equals(input)) {
+            throw new SessionException("Session does not belong to user", ErrorCodes.BAD_REQUEST);
         }
         String status = (String) sessionData.get("status");
         if (!"ACTIVE".equals(status)) {
-            throw new SessionException("Session is not active",ErrorCodes.BAD_REQUEST);
+            throw new SessionException("Session is not active", ErrorCodes.BAD_REQUEST);
         }
         redisTemplate.expire(sessionKey, java.time.Duration.ofMinutes(5));
         Map<String, Object> response = new HashMap<>();

@@ -4,7 +4,8 @@ public enum ServiceType {
 
     OTP_GENERATE("GENERATE_OTP"),
     OTP_VALIDATE("VALIDATE_OTP"),
-    SESSION_VALIDATE("SESSION_VALIDATE");
+    SESSION_VALIDATE("SESSION_VALIDATE"),
+    GSTIN_FETCH("GSTIN_FETCH");
     private final String code;
     ServiceType(String code) {
         this.code = code;

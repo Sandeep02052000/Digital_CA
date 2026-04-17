@@ -75,31 +75,49 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
      * @throws InvocationTargetException
      */
     @Override
-    protected Map<String, Object> executeService(Map<String, Object> request) throws IllegalAccessError {
+    protected Map<String, Object> executeService(Map<String, Object> request) {
 
-        String otp = (String) request.get(OTP);
-        String msisdn = (String) request.get(PHONE_NUMBER);
-        if(StringUtil.isNullOrEmpty(otp) || StringUtil.isNullOrEmpty(msisdn)) {
+        String otp = (String) request.get("otp");
+        String type = (String) request.get("type");
+        String value = (String) request.get("value");
+
+        if (StringUtil.isNullOrEmpty(otp)
+                || StringUtil.isNullOrEmpty(type)
+                || StringUtil.isNullOrEmpty(value)) {
             throw new OtpException("Invalid request", ErrorCodes.BAD_REQUEST);
         }
-        if(!validateMsisdn(msisdn)) {
-            throw new OtpException("Invalid Phone Number",ErrorCodes.BAD_REQUEST);
+
+        type = type.trim().toLowerCase();
+        value = value.trim();
+
+        String input = value;
+        if ("phone".equals(type)) {
+            input = value;
+        } else if ("email".equals(type)) {
+            input = value;
+        } else {
+            throw new OtpException("Invalid type. Allowed: phone/email", ErrorCodes.BAD_REQUEST);
         }
-        if(!validateOtp(otp)) {
-            throw new OtpException("Invalid OTP",ErrorCodes.BAD_REQUEST);
+        if (!validateOtp(otp)) {
+            throw new OtpException("Invalid OTP", ErrorCodes.BAD_REQUEST);
         }
-        boolean isEnabled = Boolean.parseBoolean(configuration.getPropertyByServiceCode(Constants.REDIS_CONFIG_ENABLED.getValue(), ServiceConstant.GEN_OTP.getValue(), "True"));
-        if(isEnabled) {
-            String key = REDIS_KEY_PREFIX + msisdn;
+        boolean isEnabled = Boolean.parseBoolean(
+                configuration.getPropertyByServiceCode(
+                        Constants.REDIS_CONFIG_ENABLED.getValue(),
+                        ServiceConstant.GEN_OTP.getValue(),
+                        "True"
+                )
+        );
+        if (isEnabled) {
+            String key = REDIS_KEY_PREFIX + input;
             String result = redisTemplate.execute(
                     otpVerifyScript,
                     java.util.Collections.singletonList(key),
                     otp
             );
             switch (result) {
-                case "VERIFIED": {
-                    return executeInternalGstinValidate(msisdn);
-                }
+                case "VERIFIED":
+                    return executeInternalGstinValidate(input);
                 case "INVALID":
                     throw new OtpException("Invalid OTP, please try again", ErrorCodes.BAD_REQUEST);
                 case "MAX_ATTEMPTS":
@@ -110,8 +128,9 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
             }
         } else {
             Optional<OtpRecord> optionalRecord =
-                    repository.findTopByPhoneNumberAndOtpStatusOrderByCreatedOnDesc(
-                            msisdn, OtpRecord.OtpStatus.ACTIVE);
+                    repository.findTopByInputAndOtpStatusOrderByCreatedOnDesc(
+                            input, OtpRecord.OtpStatus.ACTIVE
+                    );
             if (optionalRecord.isEmpty()) {
                 throw new OtpException("OTP not found or already used", ErrorCodes.BAD_REQUEST);
             }
@@ -132,13 +151,12 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
             }
             record.setOtpStatus(OtpRecord.OtpStatus.USED);
             repository.save(record);
-            return executeInternalGstinValidate(msisdn);
+            return executeInternalGstinValidate(input);
         }
     }
-
-    private Map<String, Object> executeInternalGstinValidate(String msisdn) {
-        User user = userRepository.findByPhoneNumber(msisdn).
-                orElseGet(() -> creation.createUser(msisdn));
+    private Map<String, Object> executeInternalGstinValidate(String input) {
+        User user = userRepository.findByInput(input).
+                orElseGet(() -> creation.createUser(input));
         Optional<UserGstin> gst = userGstinRepository.findByUserId(user.getId());
         Map<String, Object> response = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
@@ -147,7 +165,7 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
         data.put("isNewUser",gst.isEmpty());
         data.put("hasGstin",gst.isPresent());
         data.put("nextScreen",gst.isPresent() ? "dashboard":"gstin");
-        data.put("sessionId", session.createTemporarySessionForGstInUserValidation(OTP_SESSION_PREFIX, msisdn));
+        data.put("sessionId", session.createTemporarySessionForGstInUserValidation(OTP_SESSION_PREFIX, input));
         response.put(DATA, data);
         return response;
     }
@@ -159,12 +177,5 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
             otpLength = CodeConstants.DEFAULT_OTP_LENGTH;
         }
         return otp.length() == otpLength;
-    }
-    private boolean validateMsisdn(String msisdn) {
-        if (msisdn == null || msisdn.isEmpty()) {
-            return false;
-        }
-        String regex = cache.getValue(MOBILE_REGEX);
-        return msisdn.matches(regex);
     }
 }

@@ -9,8 +9,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "phone_number", nullable = false, unique = true, length = 15)
-    private String phoneNumber;
+    @Column(name = "input", nullable = false, unique = true, length = 15)
+    private String input;
     @Column(name = "country_code", length = 5)
     private String countryCode = "+91";
     @Column(name = "is_active")
@@ -34,17 +34,17 @@ public class User {
     }
     public User() {
     }
-    public User(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public User(String input) {
+        this.input = input;
     }
     public Long getId() {
         return id;
     }
     public String getPhoneNumber() {
-        return phoneNumber;
+        return input;
     }
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setInput(String input) {
+        this.input = input;
     }
     public String getCountryCode() {
         return countryCode;

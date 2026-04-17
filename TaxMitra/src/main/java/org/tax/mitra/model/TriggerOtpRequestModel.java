@@ -1,11 +1,24 @@
 package org.tax.mitra.model;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 public class TriggerOtpRequestModel extends RequestContext {
-    private String phoneNumber;
-    public String getPhoneNumber() {
-        return phoneNumber;
+    private String type;
+    private String value;
+    public String getType() {
+        return type;
     }
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }

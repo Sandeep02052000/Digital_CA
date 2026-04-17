@@ -7,23 +7,23 @@ import java.util.Map;
 @Data
 public class Otp {
 
-    private String otp;
     private Instant expiryTime;
     private OriginalPayload payload;
 
     @Data
     public static class OriginalPayload {
         private String serviceId;
-        private String phoneNumber;
+        private String type;
+        private String value;
         private String language;
     }
     public Map<String, Object> toMap() {
         return Map.of(
-                "otp", otp,
                 "expiryTime", expiryTime,
                 "payload", Map.of(
                         "serviceId", payload.getServiceId(),
-                        "phoneNumber", payload.getPhoneNumber(),
+                        "type", payload.getType(),
+                        "value", payload.getValue(),
                         "language",payload.getLanguage()
                 )
         );

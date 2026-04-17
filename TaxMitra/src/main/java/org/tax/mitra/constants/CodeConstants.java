@@ -12,4 +12,6 @@ public class CodeConstants {
     public static String MESSAGE = "message";
     public static String DATA = "data";
     public static String ERROR = "error";
+    public static String PAN_REGEX = "PAN_REGEX";
+    public static String GSTIN_REGEX = "GSTIN_REGEX";
 }

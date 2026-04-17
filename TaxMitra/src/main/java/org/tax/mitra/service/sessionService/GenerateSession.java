@@ -28,11 +28,11 @@ public class GenerateSession {
         this.configuration = configuration;
     }
 
-    public String createTemporarySessionForGstInUserValidation(String prefix, String msisdn) {
+    public String createTemporarySessionForGstInUserValidation(String prefix, String input) {
         String sessionId = UUID.randomUUID().toString();
         String redisKey = prefix + sessionId;
         Map<String, Object> sessionData = new HashMap<>();
-        sessionData.put("mobile", msisdn);
+        sessionData.put("input", input);
         sessionData.put("stage", "OTP_VERIFIED");
         sessionData.put("status", "ACTIVE");
         try {

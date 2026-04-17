@@ -19,8 +19,8 @@ public class OtpRecord {
     @Column(name = "otp_id")
     private Long otpId;
 
-    @Column(name = "msisdn")
-    private String phoneNumber;
+    @Column(name = "input")
+    private String input;
 
     @Column(name = "otp")
     private String otp;

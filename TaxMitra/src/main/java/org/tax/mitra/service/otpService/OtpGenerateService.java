@@ -12,10 +12,13 @@ import org.tax.mitra.config.TaxConfiguration;
 import org.tax.mitra.constants.*;
 import org.tax.mitra.entity.OtpRecord;
 import org.tax.mitra.exception.OtpException;
+import org.tax.mitra.model.Notification;
 import org.tax.mitra.model.Otp;
 import org.tax.mitra.model.TriggerOtpRequestModel;
 import org.tax.mitra.repository.OtpRecordRepository;
 import org.tax.mitra.service.CommonService;
+import org.tax.mitra.service.notificationService.NotificationService;
+import org.w3c.dom.Notation;
 
 import java.security.SecureRandom;
 import java.time.Instant;
@@ -42,6 +45,8 @@ public class OtpGenerateService extends CommonService<TriggerOtpRequestModel> {
     @Autowired
     private SystemPreferenceCache preferenceCache;
     @Autowired
+    private NotificationService notificationService;
+    @Autowired
     public OtpGenerateService(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
@@ -52,54 +57,75 @@ public class OtpGenerateService extends CommonService<TriggerOtpRequestModel> {
     }
     @Override
     protected Map<String, Object> executeService(Map<String, Object> request) {
-        logger.info("Inside generate Otp Service :: {}",request);
-        Map<String,Object> response = new HashMap<>();
-        String phoneNumber = (String) request.get(PHONE_NUMBER);
-        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
-            throw new OtpException("Phone number is required", ErrorCodes.BAD_REQUEST);
+        logger.info("Inside generate Otp Service :: {}", request);
+        Map<String, Object> response = new HashMap<>();
+        String type = (String) request.get("type");
+        String value = (String) request.get("value");
+        if (type == null || type.trim().isEmpty()) {
+            throw new OtpException("Type is required (phone/email)", ErrorCodes.BAD_REQUEST);
         }
-        phoneNumber = phoneNumber.trim();
+        if (value == null || value.trim().isEmpty()) {
+            throw new OtpException("Value is required", ErrorCodes.BAD_REQUEST);
+        }
+        type = type.trim().toLowerCase();
+        value = value.trim();
+        String input = null;
+        if ("phone".equals(type)) {
+            input = value;
+        } else if ("email".equals(type)) {
+            input = value;
+        } else {
+            throw new OtpException("Invalid type. Allowed: phone/email", ErrorCodes.BAD_REQUEST);
+        }
         Otp otp = new Otp();
         otp.setPayload(mapper.convertValue(request, Otp.OriginalPayload.class));
-        if(generateOtp(otp, phoneNumber)) {
-            response.put(DATA,otp.toMap());
-            response.put(MESSAGE,"OTP Generated Successfully");
+        if (generateOtp(otp, input)) {
+            response.put(DATA, otp.toMap());
+            response.put(MESSAGE, "OTP Generated Successfully");
         } else {
-            response.put(MESSAGE,"Failed to generate OTP");
+            response.put(MESSAGE, "Failed to generate OTP");
         }
         return response;
     }
-
     /**
      * @return
      */
-    private boolean generateOtp(Otp otp, String phoneNumber) {
+    private boolean generateOtp(Otp otp, String input) {
         String generatedOtp = randomOtpGenerator();
-        otp.setOtp(generatedOtp);
         long expirySeconds = getExpirySeconds();
         Instant expiryTime = Instant.now().plusSeconds(expirySeconds);
         otp.setExpiryTime(expiryTime);
         boolean isRedisEnabled = isRedisEnabled();
-        logger.info("Generating OTP for msisdn={}, redisEnabled={}", phoneNumber, isRedisEnabled);
+        logger.info("Generating OTP for input={}, redisEnabled={}", input, isRedisEnabled);
         if (isRedisEnabled) {
-            handleRedisStorage(phoneNumber, generatedOtp, expirySeconds);
+            handleRedisStorage(input, generatedOtp, expirySeconds);
         } else {
-            handleDatabaseStorage(phoneNumber, generatedOtp);
+            handleDatabaseStorage(input, generatedOtp);
         }
+        triggerAsyncOtp(input,generatedOtp);
         return true;
     }
 
-    private void handleRedisStorage(String phoneNumber, String otp, long expirySeconds) {
-        try {
+    private void triggerAsyncOtp(String input, String otp) {
+        if(input.matches(preferenceCache.getValue(MOBILE_REGEX))) {
+            //TODO:: Will Implement post MSG91 Integration with the Backend System
+        } else {
+            notificationService.sendNotification(Notification.builder()
+                    .emailNotif(false)
+                    .email(input)
+                    .message(prepareMessageToSend(otp))
+                    .build());
+        }
+    }
 
-            String key = REDIS_KEY_PREFIX + phoneNumber.trim();
-            Boolean exists = redisTemplate.hasKey(key);
-            if (Boolean.TRUE.equals(exists)) {
-                throw new OtpException(
-                        "OTP already sent. Please wait before retrying.",
-                        ErrorCodes.TOO_MANY_REQUESTS
-                );
-            }
+    private String prepareMessageToSend(String otp) {
+        return otp;
+    }
+
+    private void handleRedisStorage(String input, String otp, long expirySeconds) {
+        try {
+            String key = REDIS_KEY_PREFIX + input.trim();
+            redisTemplate.delete(key);
             redisTemplate.opsForHash().put(key, "code", otp);
             redisTemplate.opsForHash().put(key, "attempts", "0");
             redisTemplate.opsForHash().put(key, "status", "active");
@@ -108,10 +134,11 @@ public class OtpGenerateService extends CommonService<TriggerOtpRequestModel> {
             throw new OtpException(ex.getMessage(), ErrorCodes.BAD_REQUEST);
         }
     }
-    private void handleDatabaseStorage(String phoneNumber, String otp) {
+
+    private void handleDatabaseStorage(String input, String otp) {
         Optional<OtpRecord> existingRecord =
-                repository.findTopByPhoneNumberAndOtpStatusOrderByCreatedOnDesc(
-                        phoneNumber,
+                repository.findTopByInputAndOtpStatusOrderByCreatedOnDesc(
+                        input,
                         OtpRecord.OtpStatus.ACTIVE
                 );
         existingRecord.ifPresent(record -> {
@@ -119,7 +146,7 @@ public class OtpGenerateService extends CommonService<TriggerOtpRequestModel> {
             repository.save(record);
         });
         OtpRecord newRecord = new OtpRecord();
-        newRecord.setPhoneNumber(phoneNumber);
+        newRecord.setInput(input);
         newRecord.setOtp(otp);
         newRecord.setOtpStatus(OtpRecord.OtpStatus.ACTIVE);
         newRecord.setInvalidAttempts(0);

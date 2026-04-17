@@ -13,17 +13,17 @@ public class UserCreation {
     @Autowired
     UserRepository repository;
 
-    public User createUser(String msisdn) {
+    public User createUser(String input) {
         try {
             User user = new User();
-            user.setPhoneNumber(msisdn);
+            user.setInput(input);
             user.setIsActive(true);
             user.setIsPhoneVerified(true);
-            user.setOnboardingStatus("PHONE_VERIFIED");
+            user.setOnboardingStatus("VERIFIED");
 
             return repository.save(user);
         } catch (DataIntegrityViolationException ex){
-            return repository.findByPhoneNumber(msisdn)
+            return repository.findByInput(input)
                     .orElseThrow(() -> new OtpException("User creation failed", ErrorCodes.BAD_REQUEST));
         }
     }

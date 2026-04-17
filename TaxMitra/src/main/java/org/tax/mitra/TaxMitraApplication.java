@@ -3,6 +3,7 @@ package org.tax.mitra;
 import org.apache.hc.core5.util.Timeout;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -28,8 +29,8 @@ public class TaxMitraApplication {
         connectionManager.setMaxTotal(100);
         connectionManager.setDefaultMaxPerRoute(20);
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(Timeout.ofDays(5_000))
-                .setResponseTimeout(Timeout.ofDays(5_000))
+                .setConnectTimeout(Timeout.ofSeconds(5))
+                .setResponseTimeout(Timeout.ofSeconds(10))
                 .build();
         var httpClient = HttpClients.custom()
                 .setConnectionManager(connectionManager)

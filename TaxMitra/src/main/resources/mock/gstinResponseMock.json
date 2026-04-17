@@ -1,0 +1,614 @@
+[
+  {
+    "error": false,
+    "data": {
+      "stjCd": "PB003",
+      "lgnm": "Aman Kumar",
+      "stj": "Ludhiana West - Ward 12",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "03AABPA1234C1Z5",
+      "nba": ["Retail Business"],
+      "lstupdt": "12/02/2021",
+      "rgdt": "10/01/2019",
+      "ctb": "Proprietorship",
+      "pradr": {
+        "addr": {
+          "bnm": "",
+          "st": "Model Town",
+          "loc": "Ludhiana",
+          "bno": "22",
+          "dst": "Ludhiana",
+          "stcd": "Punjab",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "141002",
+          "lg": ""
+        },
+        "ntr": "Retail Business"
+      },
+      "tradeNam": "Aman Store",
+      "sts": "Active",
+      "ctjCd": "ZE0501",
+      "ctj": "RANGE-I"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "DL001",
+      "lgnm": "Neha Enterprises",
+      "stj": "Delhi East - Ward 5",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "07AAECN5678F1Z2",
+      "nba": ["Manufacturing"],
+      "lstupdt": "05/06/2022",
+      "rgdt": "15/08/2020",
+      "ctb": "Partnership",
+      "pradr": {
+        "addr": {
+          "bnm": "Industrial Area",
+          "st": "Seelampur",
+          "loc": "Delhi",
+          "bno": "88",
+          "dst": "East Delhi",
+          "stcd": "Delhi",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "110053",
+          "lg": ""
+        },
+        "ntr": "Manufacturing"
+      },
+      "tradeNam": "Neha Industries",
+      "sts": "Active",
+      "ctjCd": "ZD0102",
+      "ctj": "RANGE-II"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "MH002",
+      "lgnm": "Ravi Sharma",
+      "stj": "Mumbai South - Ward 9",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "27AABPR9988K1Z9",
+      "nba": ["Wholesale Business"],
+      "lstupdt": "18/11/2023",
+      "rgdt": "22/03/2018",
+      "ctb": "Proprietorship",
+      "pradr": {
+        "addr": {
+          "bnm": "",
+          "st": "Dadar",
+          "loc": "Mumbai",
+          "bno": "101",
+          "dst": "Mumbai",
+          "stcd": "Maharashtra",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "400014",
+          "lg": ""
+        },
+        "ntr": "Wholesale Business"
+      },
+      "tradeNam": "Sharma Traders",
+      "sts": "Active",
+      "ctjCd": "ZM0201",
+      "ctj": "RANGE-I"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "KA001",
+      "lgnm": "Sunrise Tech Pvt Ltd",
+      "stj": "Bangalore North - Ward 7",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "29AAECS1111D1Z8",
+      "nba": ["IT Services"],
+      "lstupdt": "01/01/2024",
+      "rgdt": "12/07/2016",
+      "ctb": "Private Limited Company",
+      "pradr": {
+        "addr": {
+          "bnm": "Tech Park",
+          "st": "Whitefield",
+          "loc": "Bangalore",
+          "bno": "5A",
+          "dst": "Bangalore",
+          "stcd": "Karnataka",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "560066",
+          "lg": ""
+        },
+        "ntr": "IT Services"
+      },
+      "tradeNam": "Sunrise Tech",
+      "sts": "Active",
+      "ctjCd": "ZK0303",
+      "ctj": "RANGE-III"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "UP001",
+      "lgnm": "Shree Traders",
+      "stj": "Lucknow Central - Ward 2",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "09AAEPS2222M1Z6",
+      "nba": ["Retail Business"],
+      "lstupdt": "09/09/2023",
+      "rgdt": "01/04/2020",
+      "ctb": "Proprietorship",
+      "pradr": {
+        "addr": {
+          "bnm": "",
+          "st": "Hazratganj",
+          "loc": "Lucknow",
+          "bno": "17",
+          "dst": "Lucknow",
+          "stcd": "Uttar Pradesh",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "226001",
+          "lg": ""
+        },
+        "ntr": "Retail Business"
+      },
+      "tradeNam": "Shree General Store",
+      "sts": "Active",
+      "ctjCd": "ZU0401",
+      "ctj": "RANGE-I"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "TN001",
+      "lgnm": "Karthik Textiles",
+      "stj": "Chennai South - Ward 14",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "33AABCK3333H1Z1",
+      "nba": ["Textile Business"],
+      "lstupdt": "20/07/2022",
+      "rgdt": "11/11/2017",
+      "ctb": "Partnership",
+      "pradr": {
+        "addr": {
+          "bnm": "",
+          "st": "T Nagar",
+          "loc": "Chennai",
+          "bno": "45",
+          "dst": "Chennai",
+          "stcd": "Tamil Nadu",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "600017",
+          "lg": ""
+        },
+        "ntr": "Textile Business"
+      },
+      "tradeNam": "Karthik Fabrics",
+      "sts": "Active",
+      "ctjCd": "ZT0202",
+      "ctj": "RANGE-II"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "RJ001",
+      "lgnm": "Raj Motors",
+      "stj": "Jaipur North - Ward 8",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "08AAAPR4444P1Z3",
+      "nba": ["Automobile Services"],
+      "lstupdt": "15/05/2021",
+      "rgdt": "21/09/2018",
+      "ctb": "Proprietorship",
+      "pradr": {
+        "addr": {
+          "bnm": "",
+          "st": "MI Road",
+          "loc": "Jaipur",
+          "bno": "300",
+          "dst": "Jaipur",
+          "stcd": "Rajasthan",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "302001",
+          "lg": ""
+        },
+        "ntr": "Automobile Services"
+      },
+      "tradeNam": "Raj Auto Works",
+      "sts": "Active",
+      "ctjCd": "ZR0101",
+      "ctj": "RANGE-I"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "GJ001",
+      "lgnm": "Krishna Traders",
+      "stj": "Ahmedabad East - Ward 3",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "24AAAPK5555L1Z4",
+      "nba": ["Wholesale Business"],
+      "lstupdt": "30/08/2022",
+      "rgdt": "14/02/2019",
+      "ctb": "Proprietorship",
+      "pradr": {
+        "addr": {
+          "bnm": "",
+          "st": "Maninagar",
+          "loc": "Ahmedabad",
+          "bno": "12",
+          "dst": "Ahmedabad",
+          "stcd": "Gujarat",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "380008",
+          "lg": ""
+        },
+        "ntr": "Wholesale Business"
+      },
+      "tradeNam": "Krishna Trading Co",
+      "sts": "Active",
+      "ctjCd": "ZG0102",
+      "ctj": "RANGE-II"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "WB001",
+      "lgnm": "Bengal Supplies",
+      "stj": "Kolkata South - Ward 6",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "19AABCB6666Q1Z7",
+      "nba": ["Distribution"],
+      "lstupdt": "10/10/2023",
+      "rgdt": "05/05/2020",
+      "ctb": "Partnership",
+      "pradr": {
+        "addr": {
+          "bnm": "",
+          "st": "Park Street",
+          "loc": "Kolkata",
+          "bno": "77",
+          "dst": "Kolkata",
+          "stcd": "West Bengal",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "700016",
+          "lg": ""
+        },
+        "ntr": "Distribution"
+      },
+      "tradeNam": "Bengal Supply House",
+      "sts": "Active",
+      "ctjCd": "ZW0201",
+      "ctj": "RANGE-I"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "HR001",
+      "lgnm": "Gurgaon Electronics",
+      "stj": "Gurgaon West - Ward 11",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "06AABCG7777R1Z2",
+      "nba": ["Electronics Retail"],
+      "lstupdt": "14/03/2024",
+      "rgdt": "19/06/2019",
+      "ctb": "Proprietorship",
+      "pradr": {
+        "addr": {
+          "bnm": "",
+          "st": "Sector 14",
+          "loc": "Gurgaon",
+          "bno": "55",
+          "dst": "Gurgaon",
+          "stcd": "Haryana",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "122001",
+          "lg": ""
+        },
+        "ntr": "Electronics Retail"
+      },
+      "tradeNam": "Gurgaon Electronics Hub",
+      "sts": "Active",
+      "ctjCd": "ZH0101",
+      "ctj": "RANGE-I"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "MP001",
+      "lgnm": "Narmada Foods",
+      "stj": "Bhopal Central - Ward 4",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "23AAAPN8888S1Z5",
+      "nba": ["Food Processing"],
+      "lstupdt": "02/12/2022",
+      "rgdt": "28/03/2018",
+      "ctb": "Partnership",
+      "pradr": {
+        "addr": {
+          "bnm": "",
+          "st": "MP Nagar",
+          "loc": "Bhopal",
+          "bno": "9",
+          "dst": "Bhopal",
+          "stcd": "Madhya Pradesh",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "462011",
+          "lg": ""
+        },
+        "ntr": "Food Processing"
+      },
+      "tradeNam": "Narmada Foods",
+      "sts": "Active",
+      "ctjCd": "ZM0103",
+      "ctj": "RANGE-III"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "KL001",
+      "lgnm": "Kerala Spices Ltd",
+      "stj": "Kochi Central - Ward 1",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "32AACCK9999T1Z0",
+      "nba": ["Spices Export"],
+      "lstupdt": "11/11/2023",
+      "rgdt": "30/01/2017",
+      "ctb": "Public Limited Company",
+      "pradr": {
+        "addr": {
+          "bnm": "Spice Market",
+          "st": "Mattancherry",
+          "loc": "Kochi",
+          "bno": "18",
+          "dst": "Ernakulam",
+          "stcd": "Kerala",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "682002",
+          "lg": ""
+        },
+        "ntr": "Spices Export"
+      },
+      "tradeNam": "Kerala Spice Co",
+      "sts": "Active",
+      "ctjCd": "ZK0201",
+      "ctj": "RANGE-I"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "BR001",
+      "lgnm": "Bihar Agro Traders",
+      "stj": "Patna East - Ward 9",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "10AABPB1212M1Z1",
+      "nba": ["Agriculture Supplies"],
+      "lstupdt": "06/06/2021",
+      "rgdt": "17/09/2018",
+      "ctb": "Proprietorship",
+      "pradr": {
+        "addr": {
+          "bnm": "",
+          "st": "Kankarbagh",
+          "loc": "Patna",
+          "bno": "66",
+          "dst": "Patna",
+          "stcd": "Bihar",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "800020",
+          "lg": ""
+        },
+        "ntr": "Agriculture Supplies"
+      },
+      "tradeNam": "Bihar Agro",
+      "sts": "Active",
+      "ctjCd": "ZB0101",
+      "ctj": "RANGE-I"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "AP001",
+      "lgnm": "Vizag Marine Exports",
+      "stj": "Visakhapatnam - Ward 10",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "37AABCV3333P1Z9",
+      "nba": ["Seafood Export"],
+      "lstupdt": "22/02/2024",
+      "rgdt": "09/08/2019",
+      "ctb": "Private Limited Company",
+      "pradr": {
+        "addr": {
+          "bnm": "Harbour Area",
+          "st": "Beach Road",
+          "loc": "Visakhapatnam",
+          "bno": "2B",
+          "dst": "Visakhapatnam",
+          "stcd": "Andhra Pradesh",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "530001",
+          "lg": ""
+        },
+        "ntr": "Seafood Export"
+      },
+      "tradeNam": "Vizag Marine",
+      "sts": "Active",
+      "ctjCd": "ZA0202",
+      "ctj": "RANGE-II"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "CH001",
+      "lgnm": "Chandigarh Books Depot",
+      "stj": "Chandigarh Sector 17 - Ward 2",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "04AAABC4444H1Z6",
+      "nba": ["Book Retail"],
+      "lstupdt": "03/03/2023",
+      "rgdt": "11/11/2017",
+      "ctb": "Proprietorship",
+      "pradr": {
+        "addr": {
+          "bnm": "",
+          "st": "Sector 17",
+          "loc": "Chandigarh",
+          "bno": "19",
+          "dst": "Chandigarh",
+          "stcd": "Chandigarh",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "160017",
+          "lg": ""
+        },
+        "ntr": "Book Retail"
+      },
+      "tradeNam": "City Book Store",
+      "sts": "Active",
+      "ctjCd": "ZC0101",
+      "ctj": "RANGE-I"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "JH001",
+      "lgnm": "Jharkhand Steel Works",
+      "stj": "Ranchi Industrial - Ward 6",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "20AABCJ7777N1Z3",
+      "nba": ["Steel Manufacturing"],
+      "lstupdt": "19/01/2024",
+      "rgdt": "27/07/2016",
+      "ctb": "Private Limited Company",
+      "pradr": {
+        "addr": {
+          "bnm": "Industrial Area",
+          "st": "Tupudana",
+          "loc": "Ranchi",
+          "bno": "88",
+          "dst": "Ranchi",
+          "stcd": "Jharkhand",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "834003",
+          "lg": ""
+        },
+        "ntr": "Steel Manufacturing"
+      },
+      "tradeNam": "Jharkhand Steel",
+      "sts": "Active",
+      "ctjCd": "ZJ0102",
+      "ctj": "RANGE-II"
+    }
+  },
+  {
+    "error": false,
+    "data": {
+      "stjCd": "AS001",
+      "lgnm": "Assam Tea Traders",
+      "stj": "Guwahati Central - Ward 3",
+      "dty": "Regular",
+      "adadr": [],
+      "cxdt": "",
+      "gstin": "18AABCA8888L1Z4",
+      "nba": ["Tea Export"],
+      "lstupdt": "25/12/2023",
+      "rgdt": "02/02/2018",
+      "ctb": "Partnership",
+      "pradr": {
+        "addr": {
+          "bnm": "",
+          "st": "Fancy Bazaar",
+          "loc": "Guwahati",
+          "bno": "11",
+          "dst": "Kamrup",
+          "stcd": "Assam",
+          "city": "",
+          "flno": "",
+          "lt": "",
+          "pncd": "781001",
+          "lg": ""
+        },
+        "ntr": "Tea Export"
+      },
+      "tradeNam": "Assam Tea Co",
+      "sts": "Active",
+      "ctjCd": "ZA0101",
+      "ctj": "RANGE-I"
+    }
+  }
+]
