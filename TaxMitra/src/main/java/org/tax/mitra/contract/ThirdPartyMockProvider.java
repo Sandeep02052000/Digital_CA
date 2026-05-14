@@ -27,7 +27,7 @@ public class ThirdPartyMockProvider {
         try {
             InputStream is = getClass()
                     .getClassLoader()
-                    .getResourceAsStream("mocks/gstin/gstinResponseMock.json");
+                    .getResourceAsStream("mock/gstinResponseMock.json");
 
             JavaType type = objectMapper.getTypeFactory()
                     .constructCollectionType(List.class, Object.class);

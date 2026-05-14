@@ -1,15 +1,12 @@
 package org.tax.mitra.controller;
 
-import io.netty.util.internal.StringUtil;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.tax.mitra.common.ResponseContext;
-import org.tax.mitra.exception.BaseException;
 import org.tax.mitra.model.GenericResponse;
 import org.tax.mitra.model.GstinRequestModel;
 import org.tax.mitra.service.gstService.GstinServiceListener;

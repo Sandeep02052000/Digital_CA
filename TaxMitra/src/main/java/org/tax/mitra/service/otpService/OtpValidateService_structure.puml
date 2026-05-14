@@ -1,0 +1,431 @@
+@startuml
+
+/' diagram meta data start
+config=StructureConfiguration;
+{
+  "projectClassification": {
+    "searchMode": "OpenProject", // OpenProject, AllProjects
+    "includedProjects": "",
+    "pathEndKeywords": "*.impl",
+    "isClientPath": "",
+    "isClientName": "",
+    "isTestPath": "",
+    "isTestName": "",
+    "isMappingPath": "",
+    "isMappingName": "",
+    "isDataAccessPath": "",
+    "isDataAccessName": "",
+    "isDataStructurePath": "",
+    "isDataStructureName": "",
+    "isInterfaceStructuresPath": "",
+    "isInterfaceStructuresName": "",
+    "isEntryPointPath": "",
+    "isEntryPointName": "",
+    "treatFinalFieldsAsMandatory": false
+  },
+  "graphRestriction": {
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "removeByInheritance": "", // inheritance/annotation based filtering is done in a second step
+    "removeByAnnotation": "",
+    "removeByClassPackage": "", // cleanup the graph after inheritance/annotation based filtering is done
+    "removeByClassName": "",
+    "cutMappings": false,
+    "cutEnum": true,
+    "cutTests": true,
+    "cutClient": true,
+    "cutDataAccess": true,
+    "cutInterfaceStructures": true,
+    "cutDataStructures": true,
+    "cutGetterAndSetter": true,
+    "cutConstructors": true
+  },
+  "graphTraversal": {
+    "forwardDepth": 3,
+    "backwardDepth": 3,
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "hideMappings": false,
+    "hideDataStructures": false,
+    "hidePrivateMethods": true,
+    "hideInterfaceCalls": true, // indirection: implementation -> interface (is hidden) -> implementation
+    "onlyShowApplicationEntryPoints": false, // root node is included
+    "useMethodCallsForStructureDiagram": "ForwardOnly" // ForwardOnly, BothDirections, No
+  },
+  "details": {
+    "aggregation": "GroupByClass", // ByClass, GroupByClass, None
+    "showClassGenericTypes": true,
+    "showMethods": true,
+    "showMethodParameterNames": true,
+    "showMethodParameterTypes": true,
+    "showMethodReturnType": true,
+    "showPackageLevels": 2,
+    "showDetailedClassStructure": true
+  },
+  "rootClass": "org.tax.mitra.service.otpService.OtpValidateService",
+  "extensionCallbackMethod": "" // qualified.class.name#methodName - signature: public static String method(String)
+}
+diagram meta data end '/
+
+
+
+digraph g {
+    rankdir="TB"
+    splines=polyline
+    
+
+'nodes 
+subgraph cluster_114603 { 
+   	label=tax
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   subgraph cluster_1410302332 { 
+   	label=mitra
+	labeljust=l
+	fillcolor="#d8d8d8"
+	style=filled
+   
+   CommonService1396870975[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)CommonService&lt;T extends RequestContext&gt;</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >#   context: ResponseContext [1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ execute(requestModel: T)</TD></TR>
+<TR><TD ALIGN="LEFT" ># executeService(request: Map&lt;String, Object&gt;): Map&lt;String, Object&gt;</TD></TR>
+<TR><TD ALIGN="LEFT" >- generateServiceId(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >- mapFinalResponse(result: ServiceResult)</TD></TR>
+<TR><TD ALIGN="LEFT" >- mapToServiceResult(response: Map&lt;String, Object&gt;): ServiceResult</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+FetchGstTaxPayer22114266[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)FetchGstTaxPayer</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   caller: ThirdPartyEigCaller [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   configuration: TaxConfiguration [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   preferenceCache: SystemPreferenceCache [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   repository: UserGstinRepository [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- convertToMap(data: Object): Map&lt;String, Object&gt;</TD></TR>
+<TR><TD ALIGN="LEFT" ># executeService(request: Map&lt;String, Object&gt;): Map&lt;String, Object&gt;</TD></TR>
+<TR><TD ALIGN="LEFT" >- extractInput(request: Map&lt;String, Object&gt;): String</TD></TR>
+<TR><TD ALIGN="LEFT" >- handleGSTIN(gstin: String, msisdn: String): Map&lt;String, Object&gt;</TD></TR>
+<TR><TD ALIGN="LEFT" >- handlePAN(pan: String, msisdn: String): Map&lt;String, Object&gt;</TD></TR>
+<TR><TD ALIGN="LEFT" >- processByType(input: String, type: String, msisdn: String): Map&lt;String, Object&gt;</TD></TR>
+<TR><TD ALIGN="LEFT" >- validate(input: String): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+GenerateSession2030054388[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)GenerateSession</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   configuration: TaxConfiguration [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   redisTemplate: RedisTemplate&lt;String, String&gt; [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ createTemporarySessionForGstInUserValidation(prefix: String, input: String): String</TD></TR>
+<TR><TD ALIGN="LEFT" >- getExpirySeconds(service: String): long</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+GstinServiceListenerImpl167117748[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)GstinServiceListenerImpl</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   serviceRegistry: ServiceRegistry [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ fetchTaxPayer(request: GstinRequestModel)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+OtpGenerateService1738754985[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)OtpGenerateService</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   configuration: TaxConfiguration [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mapper: ObjectMapper [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   notificationListener: NotificationListener [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   preferenceCache: SystemPreferenceCache [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   redisTemplate: RedisTemplate&lt;String, String&gt; [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   repository: OtpRecordRepository [1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" ># executeService(request: Map&lt;String, Object&gt;): Map&lt;String, Object&gt;</TD></TR>
+<TR><TD ALIGN="LEFT" >- generateOtp(otp: Otp, input: String): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >- handleDatabaseStorage(input: String, otp: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >- handleRedisStorage(input: String, otp: String, expirySeconds: long)</TD></TR>
+<TR><TD ALIGN="LEFT" >- isMobile(input: String): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >- prepareMessageToSend(otp: String): String</TD></TR>
+<TR><TD ALIGN="LEFT" >- randomOtpGenerator(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ triggerAsyncOtp(input: String, otp: String)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+OtpServiceListenerImpl10683735[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)OtpServiceListenerImpl</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   serviceRegistry: ServiceRegistry [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ generateOtp(request: TriggerOtpRequestModel)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ validateOtp(request: ValidateOtpRequest)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+OtpValidateService1738754985[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)OtpValidateService</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   cache: SystemPreferenceCache [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   configuration: TaxConfiguration [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   creation: UserCreation [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   otpVerifyScript: DefaultRedisScript&lt;String&gt; [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   redisTemplate: RedisTemplate&lt;String, String&gt; [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   repository: OtpRecordRepository [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   session: GenerateSession [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   userGstinRepository: UserGstinRepository [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   userRepository: UserRepository [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- executeInternalGstinValidate(input: String): Map&lt;String, Object&gt;</TD></TR>
+<TR><TD ALIGN="LEFT" ># executeService(request: Map&lt;String, Object&gt;): Map&lt;String, Object&gt;</TD></TR>
+<TR><TD ALIGN="LEFT" >- validateOtp(otp: String): boolean</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+ResponseContext891424351[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)ResponseContext</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   code: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   data: Object [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   httpStatus: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   message: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   success: boolean [1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" ># canEqual(other: Object): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >+ failure(code: String, message: String, data: Object, status: int)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ success(code: String, message: String, data: Object)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ toResponse(): GenericResponse</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+ServiceRegistry1396870975[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)ServiceRegistry</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   registry: Map&lt;ServiceType, CommonService&lt;?&gt;&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ getService(type: ServiceType): CommonService&lt;?&gt;</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+SessionServiceListenerImpl621252926[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)SessionServiceListenerImpl</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   serviceRegistry: ServiceRegistry [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ validateSession(request: ValidateSessionRequest)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+SystemPreference947963991[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)SystemPreference</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >#   preferenceCode: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   preferenceValue: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   status: String [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" ># canEqual(other: Object): boolean</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+SystemPreferenceCache1772786546[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)SystemPreferenceCache</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   cache: Map&lt;String, SystemPreference&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   repository: SystemPreferenceRepository [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ get(code: String): SystemPreference</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getValue(code: String): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ isEnabled(code: String): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >+ loadCache()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ refresh()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+TaxConfiguration891447222[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)TaxConfiguration</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   environment: Environment [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   properties: Properties [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ getBooleanProperty(name: String): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getProperty(name: String): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getProperty(name: String, defaultValue: String): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getPropertyByServiceCode(name: String, serviceCode: String, defaultValue: String): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+UserCreation1712796732[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)UserCreation</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >#   repository: UserRepository [1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ createUser(input: String): User</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+UserLoginService1712796732[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)UserLoginService</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   cache: SystemPreferenceCache [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" ># executeService(request: Map&lt;String, Object&gt;): Map&lt;String, Object&gt;</TD></TR>
+<TR><TD ALIGN="LEFT" >- resolveLoginType(type: String, value: String): String</TD></TR>
+<TR><TD ALIGN="LEFT" >- validateEmail(value: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >- validateMsisdn(value: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >- validateRequest(request: Map&lt;String, Object&gt;)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+UserServiceListenerImpl269322762[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)UserServiceListenerImpl</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   serviceRegistry: ServiceRegistry [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ loginUser(request: LoginUserRequest)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+ValidateSession2030054388[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)ValidateSession</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   objectMapper: ObjectMapper [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   redisTemplate: RedisTemplate&lt;String, String&gt; [1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" ># executeService(request: Map&lt;String, Object&gt;): Map&lt;String, Object&gt;</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+} 
+
+'edges    
+CommonService1396870975 -> FetchGstTaxPayer22114266[arrowhead=none, arrowtail=empty, dir=both];
+CommonService1396870975 -> OtpGenerateService1738754985[arrowhead=none, arrowtail=empty, dir=both];
+CommonService1396870975 -> OtpValidateService1738754985[arrowhead=none, arrowtail=empty, dir=both];
+CommonService1396870975 -> ResponseContext891424351[label="context
+[1]"];
+CommonService1396870975 -> UserLoginService1712796732[arrowhead=none, arrowtail=empty, dir=both];
+CommonService1396870975 -> ValidateSession2030054388[arrowhead=none, arrowtail=empty, dir=both];
+GenerateSession2030054388 -> TaxConfiguration891447222[label="configuration
+[0..1]"];
+GstinServiceListenerImpl167117748 -> ServiceRegistry1396870975[label="serviceRegistry
+[0..1]"];
+OtpServiceListenerImpl10683735 -> ServiceRegistry1396870975[label="serviceRegistry
+[0..1]"];
+OtpValidateService1738754985 -> GenerateSession2030054388[label="session
+[0..1]"];
+OtpValidateService1738754985 -> SystemPreferenceCache1772786546[label="cache
+[0..1]"];
+OtpValidateService1738754985 -> TaxConfiguration891447222[label="configuration
+[0..1]"];
+OtpValidateService1738754985 -> UserCreation1712796732[label="creation
+[0..1]"];
+ServiceRegistry1396870975 -> CommonService1396870975[label="registry
+[0..*]"];
+SessionServiceListenerImpl621252926 -> ServiceRegistry1396870975[label="serviceRegistry
+[0..1]"];
+SystemPreferenceCache1772786546 -> SystemPreference947963991[label="cache
+[0..*]"];
+UserServiceListenerImpl269322762 -> ServiceRegistry1396870975[label="serviceRegistry
+[0..1]"];
+    
+}
+@enduml

@@ -19,21 +19,25 @@ public class ThirdPartyEigCaller {
 
     @Autowired
     public ThirdPartyEigCaller(RestTemplate restTemplate,
-                               @Value("${thirdparty.mock-enabled:true}") ThirdPartyMockProvider mockProvider) {
+                               ThirdPartyMockProvider mockProvider,
+                               @Value("${thirdparty.mock-enabled:true}") boolean mockEnabled) {
         this.restTemplate = restTemplate;
         this.mockProvider = mockProvider;
+        this.mockEnabled = mockEnabled;
     }
-    public <T> ResponseEntity<T> execute(
+
+    public ResponseEntity<Map> execute(
             String url,
             HttpMethod method,
             Map<String, String> headers,
             Map<String, String> queryParams,
-            Object requestBody,
-            Class<T> responseType
+            Object requestBody
     ) {
         if (mockEnabled) {
             Map<String,Object> mockBody = mockProvider.getByGstinId(queryParams);
-            return (ResponseEntity<T>) ResponseEntity.ok(mockBody);
+            @SuppressWarnings("unchecked")
+            ResponseEntity<Map> response = ResponseEntity.ok(mockBody);
+            return response;
         }
         try {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
@@ -51,11 +55,11 @@ public class ThirdPartyEigCaller {
             } else {
                 entity = new HttpEntity<>(httpHeaders);
             }
-            ResponseEntity<T> response = restTemplate.exchange(
+            ResponseEntity<Map> response = restTemplate.exchange(
                     finalUrl,
                     method,
                     entity,
-                    responseType
+                    Map.class
             );
             if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException(
@@ -86,12 +90,12 @@ public class ThirdPartyEigCaller {
         }
     }
 
-    public <T> ResponseEntity<T> get(String url, Map<String, String> queryParams, Class<T> responseType) {
-        return execute(url, HttpMethod.GET, getHeaders(), queryParams, null, responseType);
+    public ResponseEntity<Map> get(String url, Map<String, String> queryParams) {
+        return execute(url, HttpMethod.GET, getHeaders(), queryParams, null);
     }
 
-    public <T> ResponseEntity<T> post(String url, Object body, Class<T> responseType) {
-        return execute(url, HttpMethod.POST, getHeaders(), null, body, responseType);
+    public ResponseEntity<Map> post(String url, Object body) {
+        return execute(url, HttpMethod.POST, getHeaders(), null, body);
     }
 
     private Map<String,String> getHeaders() {

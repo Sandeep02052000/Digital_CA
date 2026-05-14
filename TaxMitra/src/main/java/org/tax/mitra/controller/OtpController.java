@@ -35,7 +35,7 @@ public class OtpController {
         service.generateOtp(request);
         return ResponseEntity
                 .status(context.getHttpStatus())
-                .body(createResponse(context));
+                .body(context.toResponse());
     }
 
     @PostMapping("/validate")
@@ -44,14 +44,6 @@ public class OtpController {
         service.validateOtp(request);
         return ResponseEntity
                 .status(context.getHttpStatus())
-                .body(createResponse(context));
-    }
-    private Object createResponse(ResponseContext context) {
-        GenericResponse response = new GenericResponse();
-        response.setSuccess(context.isSuccess());
-        response.setCode(context.getCode());
-        response.setData(context.getData());
-        response.setMessage(context.getMessage());
-        return  response;
+                .body(context.toResponse());
     }
 }

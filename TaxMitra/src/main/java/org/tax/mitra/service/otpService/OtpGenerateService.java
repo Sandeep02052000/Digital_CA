@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.tax.mitra.cache.SystemPreferenceCache;
 import org.tax.mitra.config.TaxConfiguration;
@@ -17,8 +18,7 @@ import org.tax.mitra.model.Otp;
 import org.tax.mitra.model.TriggerOtpRequestModel;
 import org.tax.mitra.repository.OtpRecordRepository;
 import org.tax.mitra.service.CommonService;
-import org.tax.mitra.service.notificationService.NotificationService;
-import org.w3c.dom.Notation;
+import org.tax.mitra.service.notification.NotificationListener;
 
 import java.security.SecureRandom;
 import java.time.Instant;
@@ -45,7 +45,7 @@ public class OtpGenerateService extends CommonService<TriggerOtpRequestModel> {
     @Autowired
     private SystemPreferenceCache preferenceCache;
     @Autowired
-    private NotificationService notificationService;
+    private NotificationListener notificationListener;
     @Autowired
     public OtpGenerateService(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -106,18 +106,27 @@ public class OtpGenerateService extends CommonService<TriggerOtpRequestModel> {
         return true;
     }
 
-    private void triggerAsyncOtp(String input, String otp) {
-        if(input.matches(preferenceCache.getValue(MOBILE_REGEX))) {
-            //TODO:: Will Implement post MSG91 Integration with the Backend System
+    @Async
+    public void triggerAsyncOtp(String input, String otp) {
+        boolean isMobile = isMobile(input);
+        Notification.NotificationType type = Notification.NotificationType.OTP;
+        String message = prepareMessageToSend(otp);
+        Notification.NotificationBuilder builder = Notification.builder()
+                .type(isMobile ? Notification.ChannelType.SMS : Notification.ChannelType.EMAIL)
+                .notificationType(type)
+                .message(message);
+        if (isMobile) {
+            builder.msisdn(input);
         } else {
-            notificationService.sendNotification(Notification.builder()
-                    .emailNotif(false)
-                    .email(input)
-                    .message(prepareMessageToSend(otp))
-                    .build());
+            builder.email(input);
         }
+        notificationListener.prepareNotificationToSend(builder.build());
     }
 
+    private boolean isMobile(String input) {
+        return input != null &&
+                input.matches(preferenceCache.getValue(MOBILE_REGEX));
+    }
     private String prepareMessageToSend(String otp) {
         return otp;
     }

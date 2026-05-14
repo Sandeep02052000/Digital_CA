@@ -12,7 +12,6 @@ import org.tax.mitra.config.TaxConfiguration;
 import org.tax.mitra.constants.*;
 import org.tax.mitra.entity.OtpRecord;
 import org.tax.mitra.entity.User;
-import org.tax.mitra.entity.UserGstin;
 import org.tax.mitra.exception.OtpException;
 import org.tax.mitra.model.ValidateOtpRequest;
 import org.tax.mitra.repository.OtpRecordRepository;
@@ -157,7 +156,7 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
     private Map<String, Object> executeInternalGstinValidate(String input) {
         User user = userRepository.findByInput(input).
                 orElseGet(() -> creation.createUser(input));
-        Optional<UserGstin> gst = userGstinRepository.findByUserId(user.getId());
+        Optional<User> gst = userGstinRepository.findByUserId(user.getId());
         Map<String, Object> response = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
         response.put(MESSAGE, "OTP Verified Successfully");

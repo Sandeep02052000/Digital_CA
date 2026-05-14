@@ -10,7 +10,7 @@ import org.tax.mitra.config.TaxConfiguration;
 import org.tax.mitra.constants.Constants;
 import org.tax.mitra.constants.ServiceType;
 import org.tax.mitra.contract.ThirdPartyEigCaller;
-import org.tax.mitra.entity.UserGstin;
+import org.tax.mitra.entity.User;
 import org.tax.mitra.exception.GstException;
 import org.tax.mitra.model.GstinRequestModel;
 import org.tax.mitra.repository.UserGstinRepository;
@@ -51,8 +51,7 @@ public class FetchGstTaxPayer extends CommonService<GstinRequestModel> {
     }
 
     @Override
-    protected Map<String, Object> executeService(Map<String, Object> request)
-            throws InvocationTargetException {
+    protected Map<String, Object> executeService(Map<String, Object> request) {
         String input = extractValue("gstin", request, () -> {throw new GstException("400", "GSTIN missing");});
         String msisdn = extractValue("phoneNumber", request, () -> {throw new GstException("400", "Phone Number missing");});
         String type = validate(input);
@@ -104,23 +103,26 @@ public class FetchGstTaxPayer extends CommonService<GstinRequestModel> {
         Map<String,Object> responseMap = new HashMap<>();
         Map<String,Object> data = new HashMap<>();
         try {
-            Optional<UserGstin> userGstin = repository.findByMsisdnAndGstin(msisdn, gstin);
-            if(userGstin.isPresent())
+            Optional<User> user = repository.findByMsisdnAndGstin(msisdn, gstin);
+            if(user.isPresent())
             {
-                data = convertToMap(userGstin.get());
+                responseMap.put("message","Details fetched successfully from Database");
+                data = convertToMap(user.get());
             } else {
                 String uri = configuration.getPropertyByServiceCode(Constants.THIRD_PARTY_URI.getValue(),ServiceType.GSTIN_FETCH.toString(),null);
-                ResponseEntity<Map> response = caller.get(uri,Map.of("gstin",gstin),Map.class);
+                ResponseEntity<Map> response = caller.get(uri,Map.of("gstin",gstin));
                 if(response.getStatusCode().is2xxSuccessful()) {
                     Map<String,Object> responseBody = response.getBody();
                     if((boolean)responseBody.get("error")) {
                         responseMap.put("error","third.party.failure");
                     } else {
-                        data = responseBody;
+                        data = (Map<String, Object>) responseBody.get("data");
                     }
+                    responseMap.put("message","Details fetched successfully");
                 }
             }
-            return data;
+            responseMap.put("data",data);
+            return responseMap;
         } catch (Exception ex) {
             throw new GstException("400","Request failed, please try again");
         }

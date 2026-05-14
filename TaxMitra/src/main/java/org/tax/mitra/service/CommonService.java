@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.tax.mitra.common.ResponseContext;
 import org.tax.mitra.constants.ServiceType;
 import org.tax.mitra.model.RequestContext;
+import org.tax.mitra.model.ServiceResult;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -24,36 +25,40 @@ public abstract class CommonService<T extends RequestContext> {
     public abstract ServiceType getServiceType();
 
     public void execute(T requestModel) {
-        Map<String, Object> request = mapper.convertValue(requestModel, new TypeReference<Map<String, Object>>() {});
-        Map<String, Object> response = new HashMap<>();
         try {
+            Map<String, Object> request = mapper.convertValue(
+                    requestModel, new TypeReference<Map<String, Object>>() {}
+            );
             request.put("serviceId", generateServiceId());
-            response = executeService(request);
-            mapFinalResponse(response);
-
+            ServiceResult result = mapToServiceResult(executeService(request));
+            mapFinalResponse(result);
         } catch (InvocationTargetException e) {
             throw new RuntimeException("Error executing service: " + getServiceType(), e);
         }
     }
 
-    private void mapFinalResponse(Map<String, Object> response) {
-        Object error = response.get(ERROR);
-        if (error == null || error.toString().trim().isEmpty()) {
-            context.setSuccess(true);
-            context.setCode(SUCCESS);
-            context.setMessage((String) response.get(MESSAGE));
-            context.setData(response.get(DATA));
-            context.setHttpStatus(200);
+    private void mapFinalResponse(ServiceResult result) {
+        if (result.isSuccess()) {
+            context.success(SUCCESS, result.getMessage(), result.getData());
         } else {
-            context.setSuccess(false);
-            context.setCode(FAILURE);
-            context.setMessage((String) response.get(MESSAGE));
-            context.setData(response.get(DATA));
-            context.setHttpStatus(400);
+            context.failure(FAILURE, result.getMessage(), result.getData(), 400);
         }
     }
-
     private String generateServiceId() {
         return UUID.randomUUID().toString();
+    }
+
+    private ServiceResult mapToServiceResult(Map<String, Object> response) {
+        ServiceResult result = new ServiceResult();
+
+        Object error = response.get(ERROR);
+
+        boolean isSuccess = (error == null || error.toString().trim().isEmpty());
+
+        result.setSuccess(isSuccess);
+        result.setMessage((String) response.get(MESSAGE));
+        result.setData(response.get(DATA));
+
+        return result;
     }
 }
