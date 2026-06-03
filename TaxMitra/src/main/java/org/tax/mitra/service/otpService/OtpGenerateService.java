@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -46,6 +47,9 @@ public class OtpGenerateService extends CommonService<TriggerOtpRequestModel> {
     private SystemPreferenceCache preferenceCache;
     @Autowired
     private NotificationListener notificationListener;
+    @Autowired
+    @Lazy
+    private OtpGenerateService self;
     @Autowired
     public OtpGenerateService(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -102,7 +106,7 @@ public class OtpGenerateService extends CommonService<TriggerOtpRequestModel> {
         } else {
             handleDatabaseStorage(input, generatedOtp);
         }
-        triggerAsyncOtp(input,generatedOtp);
+        self.triggerAsyncOtp(input,generatedOtp);
         return true;
     }
 

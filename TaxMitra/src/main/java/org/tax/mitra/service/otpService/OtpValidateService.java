@@ -11,7 +11,6 @@ import org.tax.mitra.cache.SystemPreferenceCache;
 import org.tax.mitra.config.TaxConfiguration;
 import org.tax.mitra.constants.*;
 import org.tax.mitra.entity.OtpRecord;
-import org.tax.mitra.entity.User;
 import org.tax.mitra.exception.OtpException;
 import org.tax.mitra.model.ValidateOtpRequest;
 import org.tax.mitra.repository.OtpRecordRepository;
@@ -19,7 +18,7 @@ import org.tax.mitra.repository.UserGstinRepository;
 import org.tax.mitra.repository.UserRepository;
 import org.tax.mitra.service.CommonService;
 import org.tax.mitra.service.sessionService.GenerateSession;
-import org.tax.mitra.service.userProfileService.UserCreation;
+import org.tax.mitra.service.userProfileService.UserCreationService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -40,7 +39,7 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
     private final OtpRecordRepository repository;
     private final UserRepository userRepository;
     private final UserGstinRepository userGstinRepository;
-    private final UserCreation creation;
+    private final UserCreationService creation;
     private  final DefaultRedisScript<String> otpVerifyScript;
     private final GenerateSession session;
 
@@ -49,7 +48,7 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
                               TaxConfiguration configuration,
                               SystemPreferenceCache cache,
                               OtpRecordRepository repository,
-                              UserRepository userRepository, UserGstinRepository userGstinRepository, UserCreation creation, DefaultRedisScript<String> otpVerifyScript,
+                              UserRepository userRepository, UserGstinRepository userGstinRepository, UserCreationService creation, DefaultRedisScript<String> otpVerifyScript,
                               GenerateSession session) {
         this.redisTemplate = redisTemplate;
         this.configuration = configuration;
@@ -116,7 +115,7 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
             );
             switch (result) {
                 case "VERIFIED":
-                    return executeInternalGstinValidate(input);
+                    return executeInternal(input);
                 case "INVALID":
                     throw new OtpException("Invalid OTP, please try again", ErrorCodes.BAD_REQUEST);
                 case "MAX_ATTEMPTS":
@@ -150,21 +149,14 @@ public class OtpValidateService extends CommonService<ValidateOtpRequest> {
             }
             record.setOtpStatus(OtpRecord.OtpStatus.USED);
             repository.save(record);
-            return executeInternalGstinValidate(input);
+            return executeInternal(input);
         }
     }
-    private Map<String, Object> executeInternalGstinValidate(String input) {
-        User user = userRepository.findByInput(input).
-                orElseGet(() -> creation.createUser(input));
-        Optional<User> gst = userGstinRepository.findByUserId(user.getId());
+    private Map<String, Object> executeInternal(String input) {
         Map<String, Object> response = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
         response.put(MESSAGE, "OTP Verified Successfully");
-        data.put("userId",user.getId());
-        data.put("isNewUser",gst.isEmpty());
-        data.put("hasGstin",gst.isPresent());
-        data.put("nextScreen",gst.isPresent() ? "dashboard":"gstin");
-        data.put("sessionId", session.createTemporarySessionForGstInUserValidation(OTP_SESSION_PREFIX, input));
+        data.put("sessionId", session.createTemporarySession(OTP_SESSION_PREFIX, input));
         response.put(DATA, data);
         return response;
     }

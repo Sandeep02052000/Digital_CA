@@ -28,7 +28,7 @@ public class GenerateSession {
         this.configuration = configuration;
     }
 
-    public String createTemporarySessionForGstInUserValidation(String prefix, String input) {
+    public String createTemporarySession(String prefix, String input) {
         String sessionId = UUID.randomUUID().toString();
         String redisKey = prefix + sessionId;
         Map<String, Object> sessionData = new HashMap<>();

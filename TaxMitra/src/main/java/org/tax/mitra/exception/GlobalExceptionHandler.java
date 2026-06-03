@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.tax.mitra.model.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
@@ -70,5 +71,20 @@ public class GlobalExceptionHandler {
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFound(
+            NoResourceFoundException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.builder()
+                        .status(ErrorResponse.Status.FAILED)
+                        .message("Resource not found")
+                        .errorCode("NOT_FOUND")
+                        .path(request.getRequestURI())
+                        .timestamp(LocalDateTime.now())
+                        .build());
     }
 }

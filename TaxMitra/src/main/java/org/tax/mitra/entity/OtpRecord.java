@@ -1,6 +1,7 @@
 package org.tax.mitra.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Table(name = "OTP_RECORD",schema = "tax_maind")
 @Data
 @NoArgsConstructor
-@ToString
+@AllArgsConstructor
 public class OtpRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -6,7 +6,9 @@ public enum ServiceType {
     OTP_VALIDATE("VALIDATE_OTP"),
     SESSION_VALIDATE("SESSION_VALIDATE"),
     GSTIN_FETCH("GSTIN_FETCH"),
-    USER_LOGIN("USER_LOGIN");
+    USER_LOGIN("USER_LOGIN"),
+    REG_USER("REG_USER"),
+    CHECK_IF_UNIQUE("CHECK_IF_UNIQUE");
     private final String code;
     ServiceType(String code) {
         this.code = code;

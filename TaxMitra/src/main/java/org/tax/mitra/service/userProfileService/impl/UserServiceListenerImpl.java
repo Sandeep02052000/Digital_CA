@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.tax.mitra.constants.ServiceType;
 import org.tax.mitra.model.LoginUserRequest;
+import org.tax.mitra.model.RegisterUserRequest;
+import org.tax.mitra.model.UniquenessCheckRequest;
 import org.tax.mitra.service.CommonService;
 import org.tax.mitra.service.ServiceRegistry;
 import org.tax.mitra.service.userProfileService.UserServiceListener;
@@ -21,6 +23,20 @@ public class UserServiceListenerImpl implements UserServiceListener {
     public void loginUser(LoginUserRequest request) {
         CommonService<LoginUserRequest> service =
                 (CommonService<LoginUserRequest>) serviceRegistry.getService(ServiceType.USER_LOGIN);
+        service.execute(request);
+    }
+
+    @Override
+    public void registerUser(RegisterUserRequest request) {
+        CommonService<RegisterUserRequest> service =
+                (CommonService<RegisterUserRequest>) serviceRegistry.getService(ServiceType.REG_USER);
+        service.execute(request);
+    }
+
+    @Override
+    public void checkIfUnique(UniquenessCheckRequest request) {
+        CommonService<UniquenessCheckRequest> service =
+                (CommonService<UniquenessCheckRequest>) serviceRegistry.getService(ServiceType.CHECK_IF_UNIQUE);
         service.execute(request);
     }
 }
